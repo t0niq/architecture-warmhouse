@@ -1,0 +1,14 @@
+@startuml
+package "User Management Service" {
+
+    [User Management API] --> [User Profile Manager]
+    [User Management API] --> [Home Manager]
+
+    [User Profile Manager] --> [User Repository]
+    [Home Manager] --> [Home Repository]
+
+    database "User&Home Database\n(PostgreSQL)" as UserDb
+    [User Repository] --> UserDb
+    [Home Repository] --> UserDb
+}
+@enduml

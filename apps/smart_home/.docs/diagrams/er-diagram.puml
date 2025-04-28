@@ -1,0 +1,95 @@
+@startuml
+entity User {
+  * id : UUID
+  ---
+  email : String
+  phone : String
+  passwordHash : String
+  roles : String
+  status : String
+  createdAt : DateTime
+  lastLoginAt : DateTime
+}
+
+entity Home {
+  * id : UUID
+  ---
+  ownerId : UUID
+  name : String
+  address : String
+  location : String
+  connectionStatus : String
+  createdAt : DateTime
+}
+
+entity Device {
+  * id : UUID
+  ---
+  homeId : UUID
+  type : String
+  model : String
+  manufacturer : String
+  status : String
+  connectionInfo : String
+  lastSeenAt : DateTime
+  firmwareVersion : String
+}
+
+entity Subscription {
+  * id : UUID
+  ---
+  userId : UUID
+  plan : String
+  startDate : DateTime
+  endDate : DateTime
+  status : String
+}
+
+entity Payment {
+  * id : UUID
+  ---
+  userId : UUID
+  amount : Decimal
+  currency : String
+  paymentMethod : String
+  status : String
+  paidAt : DateTime
+}
+
+entity TelemetryEvent {
+  * id : UUID
+  ---
+  deviceId : UUID
+  timestamp : DateTime
+  type : String
+  payload : String
+}
+
+entity Scenario {
+  * id : UUID
+  ---
+  homeId : UUID
+  name : String
+  trigger : String
+  actions : String
+  status : String
+  createdAt : DateTime
+}
+
+entity ScenarioDeviceLink {
+  * id : UUID
+  ---
+  scenarioId : UUID
+  deviceId : UUID
+}
+
+' Связи
+User ||--o{ Home : owns
+Home ||--o{ Device : contains
+User ||--o{ Subscription : has
+User ||--o{ Payment : pays
+Device ||--o{ TelemetryEvent : generates
+Home ||--o{ Scenario : has
+Scenario ||--o{ ScenarioDeviceLink : links
+Device ||--o{ ScenarioDeviceLink : linkedTo
+@enduml

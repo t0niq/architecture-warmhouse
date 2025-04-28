@@ -1,0 +1,13 @@
+@startuml
+package "Billing Service" {
+
+    [Billing API] --> [Subscription Manager]
+    [Subscription Manager] --> [Billing Repository]
+    [Subscription Manager] --> [Payment Processor]
+
+    [Payment Processor] --> [External Payment Gateway]
+
+    database "Billing Database\n(PostgreSQL)" as BillingDb
+    [Billing Repository] --> BillingDb
+}
+@enduml

@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: Scenario Service API
+  description: API для создания и управления сценариями автоматизации в умных домах
+  version: 1.0.0
+
+paths:
+  /scenarios:
+    get:
+      summary: Получить список сценариев пользователя
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: homeId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список сценариев
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Scenario'
+        '401':
+          description: Неавторизован
+
+    post:
+      summary: Создать новый сценарий
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioCreateRequest'
+      responses:
+        '201':
+          description: Сценарий создан
+        '400':
+          description: Ошибка создания
+        '401':
+          description: Неавторизован
+
+  /scenarios/{scenarioId}:
+    get:
+      summary: Получить сценарий по ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о сценарии
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scenario'
+        '404':
+          description: Сценарий не найден
+
+    put:
+      summary: Обновить сценарий
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioUpdateRequest'
+      responses:
+        '200':
+          description: Сценарий обновлен
+        '400':
+          description: Ошибка обновления
+        '404':
+          description: Сценарий не найден
+
+    delete:
+      summary: Удалить сценарий
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Сценарий удален
+        '404':
+          description: Сценарий не найден
+
+  /scenarios/{scenarioId}/activate:
+    post:
+      summary: Активировать сценарий
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Сценарий активирован
+        '404':
+          description: Сценарий не найден
+
+  /scenarios/{scenarioId}/deactivate:
+    post:
+      summary: Деактивировать сценарий
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: scenarioId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Сценарий деактивирован
+        '404':
+          description: Сценарий не найден
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Scenario:
+      type: object
+      properties:
+        id:
+          type: string
+        homeId:
+          type: string
+        name:
+          type: string
+        isActive:
+          type: boolean
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+
+    ScenarioCreateRequest:
+      type: object
+      required:
+        - homeId
+        - name
+        - triggers
+        - actions
+      properties:
+        homeId:
+          type: string
+        name:
+          type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+
+    ScenarioUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+
+    Trigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Тип триггера (например, "temperature", "motion_detected")
+        condition:
+          type: string
+          description: Условие (например, "greater_than", "equals")
+        value:
+          type: string
+          description: Значение для сравнения
+
+    Action:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        command:
+          type: string
+          description: Команда для устройства

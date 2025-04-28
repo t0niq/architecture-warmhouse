@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: Billing Service API
+  version: '1.0.0'
+  description: |
+    API для управления подписками, выставления счетов и проверки платежного статуса.
+
+servers:
+  - url: https://api.smart-home.io/billing
+    description: Production сервер
+
+tags:
+  - name: Billing
+
+paths:
+  /subscriptions:
+    post:
+      tags:
+        - Billing
+      summary: Оформить подписку на тариф
+      operationId: createSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSubscription'
+      responses:
+        '201':
+          description: Подписка успешно оформлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /subscriptions/{subscriptionId}:
+    get:
+      tags:
+        - Billing
+      summary: Получить данные о подписке
+      operationId: getSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о подписке
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /users/{userId}/billing-status:
+    get:
+      tags:
+        - Billing
+      summary: Проверить платёжный статус пользователя
+      operationId: getUserBillingStatus
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Платёжный статус пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingStatus'
+
+components:
+  schemas:
+    NewSubscription:
+      type: object
+      required:
+        - userId
+        - planId
+      properties:
+        userId:
+          type: string
+          description: Идентификатор пользователя
+        planId:
+          type: string
+          description: Идентификатор тарифного плана
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        planId:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - active
+            - expired
+            - cancelled
+
+    BillingStatus:
+      type: object
+      properties:
+        userId:
+          type: string
+        isActive:
+          type: boolean
+        nextBillingDate:
+          type: string
+          format: date-time

@@ -1,0 +1,25 @@
+@startuml
+class DeviceCommand {
+    +string DeviceId
+    +string CommandType
+    +Map<string, any> Payload
+    +DateTime CreatedAt
+}
+
+class DeviceCommandSender {
+    +sendCommand(DeviceCommand command)
+}
+
+class DeviceRegistry {
+    +DeviceEndpoint getDeviceEndpoint(string deviceId)
+}
+
+class DeviceEndpoint {
+    +string Address
+    +bool IsOnline
+}
+
+DeviceCommandSender --> DeviceRegistry
+DeviceCommand --> DeviceCommandSender
+DeviceRegistry --> DeviceEndpoint
+@enduml

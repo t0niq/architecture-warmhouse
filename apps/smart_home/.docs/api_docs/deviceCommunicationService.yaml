@@ -1,0 +1,76 @@
+asyncapi: '2.6.0'
+info:
+  title: Device Communication Service API
+  version: '1.0.0'
+  description: |
+    Сервис для отправки команд устройствам и получения телеметрии от устройств через брокер сообщений (MQTT / AMQP).
+
+servers:
+  production:
+    url: mqtts://broker.smart-home.io
+    protocol: mqtt
+    description: Сервер для взаимодействия с устройствами
+
+channels:
+  device/{deviceId}/commands:
+    description: Канал отправки команд на устройства
+    parameters:
+      deviceId:
+        description: Идентификатор устройства
+        schema:
+          type: string
+    publish:
+      summary: Отправка команды на устройство
+      operationId: sendCommand
+      message:
+        $ref: '#/components/messages/DeviceCommand'
+
+  device/{deviceId}/telemetry:
+    description: Канал получения телеметрии от устройства
+    parameters:
+      deviceId:
+        description: Идентификатор устройства
+        schema:
+          type: string
+    subscribe:
+      summary: Получение телеметрии от устройства
+      operationId: receiveTelemetry
+      message:
+        $ref: '#/components/messages/DeviceTelemetry'
+
+components:
+  messages:
+    DeviceCommand:
+      name: DeviceCommand
+      title: Команда для устройства
+      payload:
+        type: object
+        properties:
+          commandId:
+            type: string
+          commandType:
+            type: string
+            description: Тип команды (например, "turn_on", "set_temperature")
+          parameters:
+            type: object
+            description: Параметры команды
+            additionalProperties:
+              type: string
+
+    DeviceTelemetry:
+      name: DeviceTelemetry
+      title: Сообщение телеметрии устройства
+      payload:
+        type: object
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+          deviceId:
+            type: string
+          telemetryType:
+            type: string
+            description: Тип данных (например, "temperature", "humidity", "motion")
+          value:
+            type: string
+            description: Значение телеметрии

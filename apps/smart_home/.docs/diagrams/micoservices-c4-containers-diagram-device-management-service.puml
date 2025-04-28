@@ -1,0 +1,56 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+package "C4 Containers" {
+
+  [Web Frontend] as Frontend
+  [API Gateway] as APIGateway
+
+  [Auth Service\n(Go)] as AuthService
+  database "Auth Database\n(PostgreSQL)" as AuthDb
+
+  [User Management Service\n(Go)] as UserManagementService
+  database "User Database\n(PostgreSQL)" as UserDb
+
+  [Device Management Service\n(Go)] as DeviceManagementService
+  database "Device Database\n(PostgreSQL)" as DeviceDb
+
+  [Device Communication Service\n(Go / Message Broker)] as DeviceCommunicationService
+  [Message Broker\n(MeesageBroker (RabbitMQ))] as MessageBroker
+
+  [Home Onboarding Service\n(Go)] as HomeOnboardingService
+
+  [Scenario Service\n(Go)] as ScenarioService
+  database "Scenario Database\n(PostgreSQL)" as ScenarioDb
+
+  [Telemetry Service\n(Go)] as TelemetryService
+  database "Telemetry Database\n(Time-series DB)" as TelemetryDb
+
+  [Billing Service\n(Go)] as BillingService
+  database "Billing Database\n(PostgreSQL)" as BillingDb
+}
+
+Frontend --> APIGateway
+
+APIGateway --> AuthService
+APIGateway --> UserManagementService
+APIGateway --> DeviceManagementService
+APIGateway --> HomeOnboardingService
+APIGateway --> ScenarioService
+APIGateway --> TelemetryService
+APIGateway --> BillingService
+DeviceManagementService --> DeviceCommunicationService
+
+AuthService --> AuthDb
+UserManagementService --> UserDb
+DeviceManagementService --> DeviceDb
+ScenarioService --> ScenarioDb
+TelemetryService --> TelemetryDb
+BillingService --> BillingDb
+DeviceCommunicationService --> MessageBroker
+MessageBroker --> TelemetryService
+
+HomeOnboardingService --> UserManagementService
+HomeOnboardingService --> DeviceManagementService
+
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+package "Scenario Service" {
+
+    [Scenario API] --> [Scenario Manager]
+    [Scenario Manager] --> [Scenario Repository]
+
+    [Trigger Engine] --> [Scenario Repository]
+    [Trigger Engine] --> [Action Dispatcher]
+
+    [Action Dispatcher] --> [Device Management Service API]
+
+    database "Scenario Database\n(PostgreSQL)" as ScenarioDb
+    [Scenario Repository] --> ScenarioDb
+}
+@enduml

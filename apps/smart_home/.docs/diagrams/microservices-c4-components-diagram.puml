@@ -1,0 +1,28 @@
+@startuml
+@startuml
+package "Device Management Service" {
+
+    [Device API] --> [Command Handler]
+    [Device API] --> [Device Management]
+
+    [Command Handler] --> [Device Communication Client]
+    [Device Communication Client] --> [Device Repository]
+
+    [Device Management] --> [Device Repository]
+
+    database "Device Database\n(PostgreSQL)" as DeviceDb
+    [Device Repository] --> DeviceDb
+}
+
+package "Device Communication Service" {
+    [Device Communication Client] --> [Device Communication Handler]
+}
+
+package "Message Broker" {
+    [Device Communication Handler] --> [RabbitMQ]
+
+}
+    database "Device Database\n(PostgreSQL)" as DeviceDb
+    [Device Repository] --> DeviceDb
+}
+@enduml

@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: User Management Service API
+  description: API для работы с профилем пользователя и его домами в экосистеме "Тёплый дом"
+  version: 1.0.0
+
+paths:
+  /user/profile:
+    get:
+      summary: Получение профиля текущего пользователя
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Профиль пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Неавторизован
+
+    put:
+      summary: Обновление профиля пользователя
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateRequest'
+      responses:
+        '200':
+          description: Профиль успешно обновлён
+        '400':
+          description: Неверные данные
+        '401':
+          description: Неавторизован
+
+  /user/homes:
+    get:
+      summary: Получение списка домов пользователя
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список домов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Home'
+
+    post:
+      summary: Создание нового дома
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HomeCreateRequest'
+      responses:
+        '201':
+          description: Дом успешно создан
+        '400':
+          description: Ошибка создания
+        '401':
+          description: Неавторизован
+
+  /user/homes/{homeId}:
+    get:
+      summary: Получение информации о конкретном доме
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация о доме
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Home'
+        '404':
+          description: Дом не найден
+
+    put:
+      summary: Обновление информации о доме
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HomeUpdateRequest'
+      responses:
+        '200':
+          description: Дом обновлён
+        '400':
+          description: Ошибка обновления
+        '404':
+          description: Дом не найден
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UserProfileUpdateRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+        name:
+          type: string
+
+    Home:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    HomeCreateRequest:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+
+    HomeUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string

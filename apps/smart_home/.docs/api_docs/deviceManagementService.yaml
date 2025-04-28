@@ -1,0 +1,157 @@
+openapi: 3.0.3
+info:
+  title: Device Management Service API
+  description: API для регистрации, просмотра и управления устройствами в экосистеме "Тёплый дом"
+  version: 1.0.0
+
+paths:
+  /devices:
+    get:
+      summary: Получить список устройств пользователя
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: homeId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список устройств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '401':
+          description: Неавторизован
+
+    post:
+      summary: Зарегистрировать новое устройство
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistrationRequest'
+      responses:
+        '201':
+          description: Устройство зарегистрировано
+        '400':
+          description: Ошибка регистрации
+        '401':
+          description: Неавторизован
+
+  /devices/{deviceId}:
+    get:
+      summary: Получить информацию об устройстве
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Информация об устройстве
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Устройство не найдено
+
+    put:
+      summary: Обновить параметры устройства
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateRequest'
+      responses:
+        '200':
+          description: Устройство обновлено
+        '400':
+          description: Ошибка обновления
+        '404':
+          description: Устройство не найдено
+
+    delete:
+      summary: Удалить устройство
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Устройство удалено
+        '404':
+          description: Устройство не найдено
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+        homeId:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+        lastSeen:
+          type: string
+          format: date-time
+
+    DeviceRegistrationRequest:
+      type: object
+      required:
+        - homeId
+        - name
+        - type
+      properties:
+        homeId:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+
+    DeviceUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]

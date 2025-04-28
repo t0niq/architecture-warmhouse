@@ -1,0 +1,15 @@
+@startuml
+package "Telemetry Service" {
+
+    [Telemetry API] --> [Telemetry Repository]
+
+    [Telemetry Consumer] --> [Telemetry Processing]
+    [Telemetry Processing] --> [Telemetry Repository]
+
+    queue "Message Broker\n(RabbitMQ)" as MessageBroker
+    [Telemetry Consumer] --> MessageBroker
+
+    database "Telemetry Database\n(Time-series DB)" as TelemetryDb
+    [Telemetry Repository] --> TelemetryDb
+}
+@enduml

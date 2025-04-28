@@ -1,0 +1,15 @@
+@startuml
+package "Auth Service" {
+
+    [Auth API] --> [Authentication Manager]
+    [Auth API] --> [Authorization Checker]
+
+    [Authentication Manager] --> [User Credentials Repository]
+    [Authentication Manager] --> [Token Service]
+
+    [Authorization Checker] --> [Token Service]
+
+    database "Auth Database\n(PostgreSQL)" as AuthDb
+    [User Credentials Repository] --> AuthDb
+}
+@enduml

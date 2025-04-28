@@ -1,0 +1,116 @@
+openapi: 3.0.3
+info:
+  title: Home Onboarding Service API
+  version: '1.0.0'
+  description: |
+    API для добавления домов и первичной настройки устройств.
+
+servers:
+  - url: https://api.smart-home.io/onboarding
+    description: Production сервер
+
+tags:
+  - name: Home Onboarding
+
+paths:
+  /homes:
+    post:
+      tags:
+        - Home Onboarding
+      summary: Зарегистрировать новый дом
+      operationId: createHome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewHome'
+      responses:
+        '201':
+          description: Дом успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Home'
+
+  /homes/{homeId}/devices:
+    post:
+      tags:
+        - Home Onboarding
+      summary: Добавить устройство в дом
+      operationId: addDeviceToHome
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор дома
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDevice'
+      responses:
+        '201':
+          description: Устройство успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+components:
+  schemas:
+    NewHome:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+          description: Название дома
+        address:
+          type: string
+          description: Адрес дома
+
+    Home:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    NewDevice:
+      type: object
+      required:
+        - deviceId
+      properties:
+        deviceId:
+          type: string
+          description: Уникальный идентификатор устройства
+        room:
+          type: string
+          description: Название комнаты (опционально)
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+        deviceId:
+          type: string
+        homeId:
+          type: string
+        room:
+          type: string
+        addedAt:
+          type: string
+          format: date-time
