@@ -1,0 +1,19 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+ContainerDb(deviceManagementService, "Device Management Service", "Go", "Handles devices and registration")
+
+Component(api, "Device API", "REST Controller", "Exposes device management operations to API Gateway")
+Component(commandHandler, "Command Handler", "Go module", "Validates and dispatches device control commands")
+Component(stateManager, "Device Management", "Go module", "Maintains devices and configurations")
+Component(deviceRepo, "Device Repository", "Repository", "Interface to Device Database")
+Component(commClient, "Device Communication Client", "Message publisher", "Sends commands via RabbitMQ")
+
+Rel(api, commandHandler, "Calls")
+Rel(api, stateManager, "Queries/Updates state")
+Rel(commandHandler, commClient, "Sends control commands")
+Rel(stateManager, deviceRepo, "Reads/Writes")
+
+Rel_L(deviceRepo, deviceManagementService, "Connects to Device Database")
+
+@enduml

@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: Telemetry Service API
+  version: '1.0.0'
+  description: |
+    API для получения и поиска данных телеметрии от устройств.
+
+servers:
+  - url: https://api.smart-home.io/telemetry
+    description: Production сервер
+
+tags:
+  - name: Telemetry
+
+paths:
+  /devices/{deviceId}/telemetry:
+    get:
+      tags:
+        - Telemetry
+      summary: Получить телеметрию устройства
+      operationId: getDeviceTelemetry
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор устройства
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Начало интервала времени
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Конец интервала времени
+        - name: telemetryType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Тип телеметрии (например, temperature, humidity)
+      responses:
+        '200':
+          description: Список телеметрии устройства
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetryRecord'
+
+components:
+  schemas:
+    TelemetryRecord:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Время записи
+        deviceId:
+          type: string
+          description: Идентификатор устройства
+        telemetryType:
+          type: string
+          description: Тип телеметрии (например, температура, влажность)
+        value:
+          type: string
+          description: Значение телеметрии

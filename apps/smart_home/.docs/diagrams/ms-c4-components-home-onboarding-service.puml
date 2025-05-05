@@ -1,0 +1,15 @@
+@startuml
+package "Home Onboarding Service" {
+
+    [Home Onboarding API] --> [Home Setup Manager]
+    [Home Setup Manager] --> [Device Linker]
+    [Home Setup Manager] --> [Onboarding Validator]
+    [Home Setup Manager] --> [Onboarding Repository]
+
+    [Device Linker] --> [Device Management Service API]
+    [Onboarding Validator] --> [Device Communication Service API]
+
+    database "Onboarding Database\n(PostgreSQL)" as OnboardingDb
+    [Onboarding Repository] --> OnboardingDb
+}
+@enduml

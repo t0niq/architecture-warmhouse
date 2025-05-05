@@ -1,0 +1,61 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "End-user of the system")
+
+System_Boundary(smartHome, "HomeHeat Ecosystem") {
+
+  Container(webFrontend, "Web Frontend", "JavaScript/SPA", "Web UI")
+  Container(apiGateway, "API Gateway", "Nginx / Gateway", "Entry point for all API requests")
+
+  Container(authService, "Auth Service", "Go", "Handles authentication and tokens")
+  ContainerDb(authDb, "Auth Database", "PostgreSQL", "Stores user credentials and tokens")
+
+  Container(userManagementService, "User Management Service", "Go", "Manages user profiles and homes")
+  ContainerDb(userDb, "User Database", "PostgreSQL", "Stores user profiles and home data")
+
+  Container(deviceManagementService, "Device Management Service", "Go", "Handles devices and registration")
+  ContainerDb(deviceDb, "Device Database", "PostgreSQL", "Stores device metadata and config")
+
+  Container(deviceCommunicationService, "Device Communication Service", "Go", "Communicates with physical devices")
+  ContainerQueue(messageBroker, "Message Broker", "RabbitMQ", "Asynchronous message transport")
+
+  Container(homeOnboardingService, "Home Onboarding Service", "Go", "Manages home registration and setup")
+
+  Container(scenarioService, "Scenario Service", "Go", "User-defined automation logic")
+  ContainerDb(scenarioDb, "Scenario Database", "PostgreSQL", "Stores scenario rules")
+
+  Container(telemetryService, "Telemetry Service", "Go", "Collects and stores telemetry data")
+  ContainerDb(telemetryDb, "Telemetry Database", "Time-series DB", "Time-series data store")
+
+  Container(billingService, "Billing Service", "Go", "Manages subscriptions and payments")
+  ContainerDb(billingDb, "Billing Database", "PostgreSQL", "Stores payment and subscription info")
+}
+
+Rel(user, webFrontend, "Uses via UI")
+Rel(webFrontend, apiGateway, "Sends API requests")
+
+Rel(apiGateway, authService, "Calls")
+Rel(apiGateway, userManagementService, "Calls")
+Rel(apiGateway, deviceManagementService, "Calls")
+Rel(apiGateway, homeOnboardingService, "Calls")
+Rel(apiGateway, scenarioService, "Calls")
+Rel(apiGateway, telemetryService, "Calls")
+Rel(apiGateway, billingService, "Calls")
+
+Rel(authService, authDb, "Reads/Writes")
+Rel(userManagementService, userDb, "Reads/Writes")
+Rel(deviceManagementService, deviceDb, "Reads/Writes")
+Rel(deviceManagementService, deviceCommunicationService, "Sends Commands")
+Rel(deviceCommunicationService, messageBroker, "Publishes messages")
+Rel(messageBroker, telemetryService, "Sends telemetry events")
+
+Rel(scenarioService, scenarioDb, "Reads/Writes")
+Rel(telemetryService, telemetryDb, "Stores telemetry")
+Rel(billingService, billingDb, "Reads/Writes")
+
+Rel(homeOnboardingService, userManagementService, "Uses")
+Rel(homeOnboardingService, deviceManagementService, "Uses")
+Rel(scenarioService, deviceManagementService, "Uses")
+
+@enduml
