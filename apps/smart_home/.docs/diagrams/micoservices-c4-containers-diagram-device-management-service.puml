@@ -1,56 +1,61 @@
 @startuml
-!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-package "C4 Containers" {
+Person(user, "User", "End-user of the system")
 
-  [Web Frontend] as Frontend
-  [API Gateway] as APIGateway
+System_Boundary(smartHome, "HomeHeat Ecosystem") {
 
-  [Auth Service\n(Go)] as AuthService
-  database "Auth Database\n(PostgreSQL)" as AuthDb
+  Container(webFrontend, "Web Frontend", "JavaScript/SPA", "Web UI")
+  Container(apiGateway, "API Gateway", "Nginx / Gateway", "Entry point for all API requests")
 
-  [User Management Service\n(Go)] as UserManagementService
-  database "User Database\n(PostgreSQL)" as UserDb
+  Container(authService, "Auth Service", "Go", "Handles authentication and tokens")
+  ContainerDb(authDb, "Auth Database", "PostgreSQL", "Stores user credentials and tokens")
 
-  [Device Management Service\n(Go)] as DeviceManagementService
-  database "Device Database\n(PostgreSQL)" as DeviceDb
+  Container(userManagementService, "User Management Service", "Go", "Manages user profiles and homes")
+  ContainerDb(userDb, "User Database", "PostgreSQL", "Stores user profiles and home data")
 
-  [Device Communication Service\n(Go / Message Broker)] as DeviceCommunicationService
-  [Message Broker\n(MeesageBroker (RabbitMQ))] as MessageBroker
+  Container(deviceManagementService, "Device Management Service", "Go", "Handles devices and registration")
+  ContainerDb(deviceDb, "Device Database", "PostgreSQL", "Stores device metadata and config")
 
-  [Home Onboarding Service\n(Go)] as HomeOnboardingService
+  Container(deviceCommunicationService, "Device Communication Service", "Go", "Communicates with physical devices")
+  ContainerQueue(messageBroker, "Message Broker", "RabbitMQ", "Asynchronous message transport")
 
-  [Scenario Service\n(Go)] as ScenarioService
-  database "Scenario Database\n(PostgreSQL)" as ScenarioDb
+  Container(homeOnboardingService, "Home Onboarding Service", "Go", "Manages home registration and setup")
 
-  [Telemetry Service\n(Go)] as TelemetryService
-  database "Telemetry Database\n(Time-series DB)" as TelemetryDb
+  Container(scenarioService, "Scenario Service", "Go", "User-defined automation logic")
+  ContainerDb(scenarioDb, "Scenario Database", "PostgreSQL", "Stores scenario rules")
 
-  [Billing Service\n(Go)] as BillingService
-  database "Billing Database\n(PostgreSQL)" as BillingDb
+  Container(telemetryService, "Telemetry Service", "Go", "Collects and stores telemetry data")
+  ContainerDb(telemetryDb, "Telemetry Database", "Time-series DB", "Time-series data store")
+
+  Container(billingService, "Billing Service", "Go", "Manages subscriptions and payments")
+  ContainerDb(billingDb, "Billing Database", "PostgreSQL", "Stores payment and subscription info")
 }
 
-Frontend --> APIGateway
+Rel(user, webFrontend, "Uses via UI")
+Rel(webFrontend, apiGateway, "Sends API requests")
 
-APIGateway --> AuthService
-APIGateway --> UserManagementService
-APIGateway --> DeviceManagementService
-APIGateway --> HomeOnboardingService
-APIGateway --> ScenarioService
-APIGateway --> TelemetryService
-APIGateway --> BillingService
-DeviceManagementService --> DeviceCommunicationService
+Rel(apiGateway, authService, "Calls")
+Rel(apiGateway, userManagementService, "Calls")
+Rel(apiGateway, deviceManagementService, "Calls")
+Rel(apiGateway, homeOnboardingService, "Calls")
+Rel(apiGateway, scenarioService, "Calls")
+Rel(apiGateway, telemetryService, "Calls")
+Rel(apiGateway, billingService, "Calls")
 
-AuthService --> AuthDb
-UserManagementService --> UserDb
-DeviceManagementService --> DeviceDb
-ScenarioService --> ScenarioDb
-TelemetryService --> TelemetryDb
-BillingService --> BillingDb
-DeviceCommunicationService --> MessageBroker
-MessageBroker --> TelemetryService
+Rel(authService, authDb, "Reads/Writes")
+Rel(userManagementService, userDb, "Reads/Writes")
+Rel(deviceManagementService, deviceDb, "Reads/Writes")
+Rel(deviceManagementService, deviceCommunicationService, "Sends Commands")
+Rel(deviceCommunicationService, messageBroker, "Publishes messages")
+Rel(messageBroker, telemetryService, "Sends telemetry events")
 
-HomeOnboardingService --> UserManagementService
-HomeOnboardingService --> DeviceManagementService
+Rel(scenarioService, scenarioDb, "Reads/Writes")
+Rel(telemetryService, telemetryDb, "Stores telemetry")
+Rel(billingService, billingDb, "Reads/Writes")
+
+Rel(homeOnboardingService, userManagementService, "Uses")
+Rel(homeOnboardingService, deviceManagementService, "Uses")
+Rel(scenarioService, deviceManagementService, "Uses")
 
 @enduml

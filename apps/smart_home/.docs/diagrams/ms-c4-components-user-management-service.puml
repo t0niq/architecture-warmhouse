@@ -1,14 +1,20 @@
-@startuml
-package "User Management Service" {
+@startuml C4Component
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-    [User Management API] --> [User Profile Manager]
-    [User Management API] --> [Home Manager]
-
-    [User Profile Manager] --> [User Repository]
-    [Home Manager] --> [Home Repository]
-
-    database "User&Home Database\n(PostgreSQL)" as UserDb
-    [User Repository] --> UserDb
-    [Home Repository] --> UserDb
+System_Boundary(user_mgmt, "User Management Service") {
+    Container(user_api, "User Management API", "REST API", "Handles user profile and home-related operations")
+    Container(profile_manager, "User Profile Manager", "Service", "Manages user profile information")
+    Container(home_manager, "Home Manager", "Service", "Handles home-related data and logic")
+    ContainerDb(user_db, "User & Home Database", "PostgreSQL", "Stores user profiles and home data")
+    Container(user_repo, "User Repository", "Repository", "Accesses user profile data")
+    Container(home_repo, "Home Repository", "Repository", "Accesses home data")
 }
+
+Rel(user_api, profile_manager, "calls")
+Rel(user_api, home_manager, "calls")
+Rel(profile_manager, user_repo, "uses")
+Rel(home_manager, home_repo, "uses")
+Rel(user_repo, user_db, "reads/writes", "SQL")
+Rel(home_repo, user_db, "reads/writes", "SQL")
+
 @enduml

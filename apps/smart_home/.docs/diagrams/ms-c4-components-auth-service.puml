@@ -1,15 +1,22 @@
-@startuml
-package "Auth Service" {
+@startuml C4Component
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-    [Auth API] --> [Authentication Manager]
-    [Auth API] --> [Authorization Checker]
-
-    [Authentication Manager] --> [User Credentials Repository]
-    [Authentication Manager] --> [Token Service]
-
-    [Authorization Checker] --> [Token Service]
-
-    database "Auth Database\n(PostgreSQL)" as AuthDb
-    [User Credentials Repository] --> AuthDb
+' Define the system boundary
+System_Boundary(auth, "Auth Service") {
+    Container(auth_api, "Auth API", "REST API", "Handles authentication and authorization requests")
+    Container(authentication_manager, "Authentication Manager", "Service", "Processes user credentials and issues tokens")
+    Container(authorization_checker, "Authorization Checker", "Service", "Validates access tokens and permissions")
+    ContainerDb(auth_db, "Auth Database", "PostgreSQL", "Stores user credentials and token data")
+    Container(user_repo, "User Credentials Repository", "Repository", "Accesses and manages user credentials in the database")
+    Container(token_service, "Token Service", "Service", "Issues and validates tokens")
 }
+
+' Define relationships
+Rel(auth_api, authentication_manager, "calls")
+Rel(auth_api, authorization_checker, "calls")
+Rel(authentication_manager, user_repo, "uses")
+Rel(authentication_manager, token_service, "uses")
+Rel(authorization_checker, token_service, "uses")
+Rel(user_repo, auth_db, "reads/writes")
+
 @enduml
